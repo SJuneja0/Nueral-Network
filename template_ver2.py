@@ -1,16 +1,19 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+import sklearn
+from sklearn.metrics import confusion_matrix
 
 ###########################MAGIC HAPPENS HERE##########################
 # Change the hyper-parameters to get the model performs well
 config = {
     'batch_size': 64,
     'image_size': (30, 30),
-    'epochs': 20,
+    'epochs': 3,
     'optimizer': keras.optimizers.experimental.SGD(1e-2)
 }
 
@@ -18,9 +21,6 @@ config = {
 ###########################MAGIC ENDS  HERE##########################
 
 def read_data():
-    print("=========================")
-    print(os.path.abspath("./images/flower_photos"))
-    print("=========================")
     train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
         "images/flower_photos",
         validation_split=0.2,
@@ -99,7 +99,22 @@ if __name__ == '__main__':
     test_images = np.concatenate([x for x, y in test_ds], axis=0)
     test_labels = np.concatenate([y for x, y in test_ds], axis=0)
     test_prediction = np.argmax(model.predict(test_images), 1)
+
+    # print("==========================")
+    # print(test_images)
+    # print("\n")
+    # print(test_labels)
+    # print("\n")
+    # print(test_prediction)
+    # print("==========================")
+
     # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
+    cm = confusion_matrix(test_labels, test_prediction)
+    print(confusion_matrix)
+    cm_display = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
+    cm_display.plot()
+    plt.show()
+
     # 2. Report the precision and recall for 5 different classes
     # Hint: check the precision and recall functions from sklearn package or you can implement these function by yourselves.
     # 3. Visualize three misclassified images
