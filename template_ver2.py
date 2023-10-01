@@ -2,11 +2,15 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn
 from sklearn.metrics import confusion_matrix
+
+matplotlib.use('TkAgg')
+# Got this code from stackoverflow
+# https://stackoverflow.com/questions/73745245/error-using-matplotlib-in-pycharm-has-no-attribute-figurecanvas
+# resolves AttributeError: module 'backend_interagg' has no attribute 'FigureCanvas'
 
 ###########################MAGIC HAPPENS HERE##########################
 # Change the hyper-parameters to get the model performs well
