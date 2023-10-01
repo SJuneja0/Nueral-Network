@@ -22,7 +22,7 @@ def read_data():
     print(os.path.abspath("./images/flower_photos"))
     print("=========================")
     train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
-        "images/",
+        "images/flower_photos",
         validation_split=0.2,
         subset="both",
         seed=42,
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     test_labels = np.concatenate([y for x, y in test_ds], axis=0)
     test_prediction = np.argmax(model.predict(test_images), 1)
     # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
-    # 2. Report the precision and recall for 10 different classes
+    # 2. Report the precision and recall for 5 different classes
     # Hint: check the precision and recall functions from sklearn package or you can implement these function by yourselves.
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
