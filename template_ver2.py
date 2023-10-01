@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+# from keras import layers
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,11 +18,9 @@ matplotlib.use('TkAgg')
 config = {
     'batch_size': 64,
     'image_size': (30, 30),
-    'epochs': 3,
+    'epochs': 30,
     'optimizer': keras.optimizers.experimental.SGD(1e-2)
 }
-
-
 ###########################MAGIC ENDS  HERE##########################
 
 def read_data():
@@ -45,7 +44,7 @@ def data_processing(ds):
     data_augmentation = keras.Sequential(
         [
             ###########################MAGIC HAPPENS HERE##########################
-            # Use dataset augmentation methods to prevent overfitting, 
+            # Use dataset augmentation methods to prevent overfitting,
             layers.RandomFlip("horizontal"),
             layers.RandomRotation(0.3)
             ###########################MAGIC ENDS HERE##########################
@@ -104,6 +103,8 @@ if __name__ == '__main__':
     test_labels = np.concatenate([y for x, y in test_ds], axis=0)
     test_prediction = np.argmax(model.predict(test_images), 1)
 
+    # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
+
     # print("==========================")
     # print(test_images)
     # print("\n")
@@ -112,7 +113,6 @@ if __name__ == '__main__':
     # print(test_prediction)
     # print("==========================")
 
-    # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
     cm = confusion_matrix(test_labels, test_prediction)
     print(confusion_matrix)
     cm_display = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
