@@ -3,6 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 ###########################MAGIC HAPPENS HERE##########################
 # Change the hyper-parameters to get the model performs well
@@ -17,8 +18,11 @@ config = {
 ###########################MAGIC ENDS  HERE##########################
 
 def read_data():
+    print("=========================")
+    print(os.path.abspath("./images/flower_photos"))
+    print("=========================")
     train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
-        "./images/flower_photos",
+        "images/",
         validation_split=0.2,
         subset="both",
         seed=42,
