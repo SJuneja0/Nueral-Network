@@ -1,12 +1,13 @@
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
-# from keras import layers
+# from tensorflow.keras import layers
+from keras import layers
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import precision_score
 
 matplotlib.use('TkAgg')
 # Got this code from stackoverflow
@@ -18,7 +19,7 @@ matplotlib.use('TkAgg')
 config = {
     'batch_size': 64,
     'image_size': (30, 30),
-    'epochs': 30,
+    'epochs': 3,
     'optimizer': keras.optimizers.experimental.SGD(1e-2)
 }
 ###########################MAGIC ENDS  HERE##########################
@@ -106,11 +107,11 @@ if __name__ == '__main__':
     # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
 
     # print("==========================")
-    # print(test_images)
-    # print("\n")
-    # print(test_labels)
-    # print("\n")
-    # print(test_prediction)
+    print(test_images)
+    print("\n")
+    print(test_labels)
+    print("\n")
+    print(test_prediction)
     # print("==========================")
 
     cm = confusion_matrix(test_labels, test_prediction)
@@ -121,7 +122,31 @@ if __name__ == '__main__':
 
     # 2. Report the precision and recall for 5 different classes
     # Hint: check the precision and recall functions from sklearn package or you can implement these function by yourselves.
+    print("==========================")
+    precision_per_class = precision_score(test_labels, test_prediction, average=None)
+    print(precision_per_class)
+    print("==========================")
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
+    misclassifiedIndexes = []
+    for i in range(len(test_prediction)):
+        if test_prediction[i] != test_labels[i]:
+            misclassifiedIndexes.append(i)
+        if len(misclassifiedIndexes) > 3:
+            break
+
+
+    # for prediction in test_prediction:
+    #     index = test_prediction.index(prediction)
+    #     if prediction != test_labels[index]:
+    #         misclassifiedIndexes.append(index)
+    #     if len(misclassifiedIndexes) > 3:
+    #         break
+    misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]], test_images[misclassifiedIndexes[2]]]
+    print("--------------------------------")
+    # print(misclassifiedImages)
+    print(len(misclassifiedImages))
+    print("--------------------------------")
+
 
     ###########################MAGIC ENDS HERE##########################
