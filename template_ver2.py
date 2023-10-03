@@ -16,6 +16,7 @@ matplotlib.use('TkAgg')
 
 ###########################MAGIC HAPPENS HERE##########################
 # Change the hyper-parameters to get the model performs well
+# looks done
 config = {
     'batch_size': 64,
     'image_size': (30, 30),
@@ -47,7 +48,7 @@ def data_processing(ds):
     data_augmentation = keras.Sequential(
         [
             ###########################MAGIC HAPPENS HERE##########################
-            # Use dataset augmentation methods to prevent overfitting,
+            # Use dataset augmentation methods to prevent overfitting
             layers.RandomFlip("horizontal"),
             layers.RandomRotation(0.3)
             ###########################MAGIC ENDS HERE##########################
