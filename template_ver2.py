@@ -47,11 +47,11 @@ def read_data():
 def data_processing(ds):
     data_augmentation = keras.Sequential(
         [
-            ###########################MAGIC HAPPENS HERE##########################
+            ########################### MAGIC HAPPENS HERE ##########################
             # Use dataset augmentation methods to prevent overfitting
             layers.RandomFlip("horizontal"),
             layers.RandomRotation(0.3)
-            ###########################MAGIC ENDS HERE##########################
+            ########################### MAGIC ENDS HERE ##########################
         ]
     )
     ds = ds.map(
@@ -69,7 +69,7 @@ def build_model(input_shape, num_classes):
     # x = layers.Flatten()(x)
     # x = layers.Dense(hidden_units, activation='relu')(x)
 
-    ###########################MAGIC HAPPENS HERE##########################
+    ########################### MAGIC HAPPENS HERE ##########################
     # Build up a neural network to achieve better performance.
     # Use Keras API like `x = layers.XXX()(x)`
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
@@ -105,7 +105,7 @@ def build_model(input_shape, num_classes):
 
     model.save('SaucyBoy.h5')  # saving the model
 
-    ###########################MAGIC ENDS HERE##########################
+    ########################### MAGIC ENDS HERE ##########################
     print(model.summary())
     return model
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         epochs=config['epochs'],
         validation_data=val_ds
     )
-    ###########################MAGIC HAPPENS HERE##########################
+    ########################### MAGIC HAPPENS HERE ##########################
     print(history.history)
     test_loss, test_acc = model.evaluate(test_ds, verbose=2)
     print("\nTest Accuracy: ", test_acc)
@@ -180,4 +180,6 @@ if __name__ == '__main__':
 
     print("ALL DONE")
 
-    ###########################MAGIC ENDS HERE##########################
+    ########################### MAGIC ENDS HERE ##########################
+
+    ########################### * Abracadbra *  ##########################
