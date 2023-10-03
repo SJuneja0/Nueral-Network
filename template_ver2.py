@@ -14,7 +14,7 @@ matplotlib.use('TkAgg')
 # https://stackoverflow.com/questions/73745245/error-using-matplotlib-in-pycharm-has-no-attribute-figurecanvas
 # resolves AttributeError: module 'backend_interagg' has no attribute 'FigureCanvas'
 
-###########################MAGIC HAPPENS HERE##########################
+########################### MAGIC HAPPENS HERE ##########################
 # Change the hyper-parameters to get the model performs well
 
 config = {
@@ -25,7 +25,7 @@ config = {
 }
 
 
-###########################MAGIC ENDS  HERE##########################
+########################### MAGIC ENDS  HERE ##########################
 
 def read_data():
     train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
@@ -79,17 +79,21 @@ def build_model(input_shape, num_classes):
     x_input = keras.Input(shape=input_shape)
 
     # Add layers to your model using the functional API
-    x = layers.Dense(64, activation='relu')(x_input)   # 64 is the batch size
+    x = layers.Dense(64, activation='relu')(x_input)  # 64 is the batch size
     x = layers.Dropout(0.2)(x)
-    x = layers.Dense(32, activation='relu')(x)    # 32 is batch size /2
+    x = layers.Dense(32, activation='relu')(x)  # 32 is batch size /2
     x = layers.Dropout(0.2)(x)
     x_output = layers.Dense(num_classes, activation='softmax')(x)
 
     model = keras.Model(inputs=x_input, outputs=x_output)
 
-    model.compile(optimizer='SaucyBoy',
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
+    # Compile the model with optimizer and loss function
+    model.compile(optimizer=config['optimizer'],
+                  loss='SparseCategoricalCrossentropy',
+                  metrics=["accuracy"],
+                  )
+
+    # unsure if needed cuz of main
 
     features_train = np.concatenate([x for x, y in test_ds], axis=0)
     label_train = np.concatenate([y for x, y in test_ds], axis=0)
@@ -97,7 +101,17 @@ def build_model(input_shape, num_classes):
 
     # validation_data is a tuple containing the validation data features and labels
     # validation_data=(X_val, y_val)  -- unsure if needed or if defined when configured
+
     model.fit(features_train, label_train)
+
+    # or
+
+    history = model.fit(
+        train_ds,
+        epochs=config['epochs'],
+        validation_data=val_ds
+    )
+    # unsure if needed cuz of main
 
     # this is just testing
     test_loss, test_accuracy = model.evaluate(prediction_test, test_labels)
@@ -182,4 +196,4 @@ if __name__ == '__main__':
 
     ########################### MAGIC ENDS HERE ##########################
 
-    ########################### * Abracadbra *  ##########################
+    ########################### * ABRACADABRA * ##########################
