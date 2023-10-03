@@ -17,11 +17,12 @@ matplotlib.use('TkAgg')
 ########################### MAGIC HAPPENS HERE ##########################
 # Change the hyper-parameters to get the model performs well
 
+# only change here and hidden_units that is inside build_mode()
 config = {
-    'batch_size': 64,
-    'image_size': (30, 30),
-    'epochs': 3,
-    'optimizer': keras.optimizers.experimental.SGD(1e-2)
+    'batch_size': 64,  # 128 is high and 16 is low
+    'image_size': (128, 128),  # 128 is high and 16 is low
+    'epochs': 30,  # 5 - 40  46 0.50, 30 got exactly 0.5000
+    'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
 }
 
 
@@ -70,7 +71,7 @@ def build_model(input_shape, num_classes):
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
 
-    hidden_units = 64
+    hidden_units = 266 # 125 - 400
     train_ds, val_ds, test_ds = read_data()
     inputs = keras.Input(shape=input_shape)
 
@@ -83,47 +84,11 @@ def build_model(input_shape, num_classes):
     x = layers.Dropout(0.2)(x)
     x = layers.Dense((hidden_units/2), activation='relu')(x)
     x = layers.Dropout(0.2)(x)
-    x_output = layers.Dense(num_classes, activation='softmax')(x)
-
-    model = keras.Model(inputs=inputs, outputs=x_output)
-
-    ### Delete start? ###
-
-    # Compile the model with optimizer and loss function
-    model.compile(optimizer=config['optimizer'],
-                  loss='SparseCategoricalCrossentropy',
-                  metrics=["accuracy"],
-                  )
-
-    # unsure if needed cuz of main
-
-    features_train = np.concatenate([x for x, y in test_ds], axis=0)
-    label_train = np.concatenate([y for x, y in test_ds], axis=0)
-    prediction_test = np.argmax(model.predict(test_images), 1)
-
-    # validation_data is a tuple containing the validation data features and labels
-    # validation_data=(X_val, y_val)  -- unsure if needed or if defined when configured
-
-    model.fit(features_train, label_train)
-
-    # or
-
-    history = model.fit(
-        train_ds,
-        epochs=config['epochs'],
-        validation_data=val_ds
-    )
-    # unsure if needed cuz of main
-
-    ### Delete end? ###
-    #
-    # # this is just testing
-    # test_loss, test_accuracy = model.evaluate(prediction_test, test_labels)
-    # print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
-
-    model.save('SaucyBoy.h5')  # saving the model, unsure if needed
 
     ########################### MAGIC ENDS HERE ##########################
+    outputs = layers.Dense(num_classes, activation="softmax",
+                           kernel_initializer='he_normal')(x)
+    model = keras.Model(inputs, outputs)
     print(model.summary())
     return model
 
@@ -188,8 +153,8 @@ if __name__ == '__main__':
 
     misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]],
                            test_images[misclassifiedIndexes[2]]]
-    print(misclassifiedImages[0])
-    print(type(misclassifiedImages))
+    # print(misclassifiedImages[0])
+    # print(type(misclassifiedImages))
     for image in misclassifiedImages:
         pass
 
