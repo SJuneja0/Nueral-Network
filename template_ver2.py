@@ -22,6 +22,8 @@ config = {
     'epochs': 3,
     'optimizer': keras.optimizers.experimental.SGD(1e-2)
 }
+
+
 ###########################MAGIC ENDS  HERE##########################
 
 def read_data():
@@ -60,20 +62,54 @@ def data_processing(ds):
 
 
 def build_model(input_shape, num_classes):
+
+    hidden_units = 4
+
+
     inputs = keras.Input(shape=input_shape)
     x = layers.Rescaling(1. / 255)(inputs)
+    x = layers.Flatten()(x)
+    x = layers.Dense(hidden_units, activation='relu')(x)
     ###########################MAGIC HAPPENS HERE##########################
     # Build up a neural network to achieve better performance.
     # Use Keras API like `x = layers.XXX()(x)`
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
-    hidden_units = 4
-    x = layers.Flatten()(x)
-    x = layers.Dense(hidden_units, activation='relu')(x)
+
+    x_input = keras.Input(shape=input_shape)
+
+    # Add layers to your model using the functional API
+    x = layers.Dense(hidden_units, activation='relu')(x_input)
+    x = layers.Dropout(0.2)(x)
+    x = layers.Dense((hidden_units/2), activation='relu')(x)
+    x = layers.Dropout(0.2)(x)
+    x_output = layers.Dense(num_classes, activation='softmax')(x)
+
+    model = keras.Model(inputs=x_input, outputs=x_output)
+
+    model.compile(optimizer='adam',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    # features_train is the training data features.
+    # label_train is the training data labels
+    # batch size is the number of figures 800?
+    # epochs are the number of training passes
+    # validation_data is a tuple containing the validation data features and labels
+
+    # code below stays just needs to be further defined
+    # history = model.fit(features_train, label_train, batch_size=800, epochs=50, validation_data=(X_val, y_val))
+
+    # the prediction contains the data we predicted
+    # the truth contains the truth
+
+    # code below stays just needs to be further defined
+    # test_loss, test_accuracy = model.evaluate(prediction, truth)
+    # print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+
+    model.save('SaucyBoy.h5')  # saving the model
 
     ###########################MAGIC ENDS HERE##########################
-    outputs = layers.Dense(num_classes, activation="softmax", kernel_initializer='he_normal')(x)
-    model = keras.Model(inputs, outputs)
     print(model.summary())
     return model
 
@@ -136,7 +172,8 @@ if __name__ == '__main__':
         if len(misclassifiedIndexes) > 3:
             break
 
-    misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]], test_images[misclassifiedIndexes[2]]]
+    misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]],
+                           test_images[misclassifiedIndexes[2]]]
     print(misclassifiedImages[0])
     print(type(misclassifiedImages))
     for image in misclassifiedImages:
@@ -146,6 +183,5 @@ if __name__ == '__main__':
     print(misclassifiedIndexes)
 
     print("ALL DONE")
-
 
     ###########################MAGIC ENDS HERE##########################
