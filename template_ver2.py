@@ -16,7 +16,7 @@ matplotlib.use('TkAgg')
 
 ###########################MAGIC HAPPENS HERE##########################
 # Change the hyper-parameters to get the model performs well
-# looks done
+
 config = {
     'batch_size': 64,
     'image_size': (30, 30),
@@ -63,7 +63,6 @@ def data_processing(ds):
 
 
 def build_model(input_shape, num_classes):
-
     # hidden_units = 4
     # inputs = keras.Input(shape=input_shape)
     # x = layers.Rescaling(1. / 255)(inputs)
@@ -75,13 +74,14 @@ def build_model(input_shape, num_classes):
     # Use Keras API like `x = layers.XXX()(x)`
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
+
     train_ds, val_ds, test_ds = read_data()
     x_input = keras.Input(shape=input_shape)
 
     # Add layers to your model using the functional API
-    x = layers.Dense(64, activation='relu')(x_input)
+    x = layers.Dense(64, activation='relu')(x_input)   # 64 is the batch size
     x = layers.Dropout(0.2)(x)
-    x = layers.Dense((32 / 2), activation='relu')(x)
+    x = layers.Dense(32, activation='relu')(x)    # 32 is batch size /2
     x = layers.Dropout(0.2)(x)
     x_output = layers.Dense(num_classes, activation='softmax')(x)
 
@@ -152,8 +152,8 @@ if __name__ == '__main__':
     # cm_display.plot()
     # plt.show()
 
-    # 2. Report the precision and recall for 5 different classes
-    # Hint: check the precision and recall functions from sklearn package or you can implement these function by yourselves.
+    # 2. Report the precision and recall for 5 different classes Hint: check the precision and recall functions from
+    # sklearn package, or you can implement these function by yourselves.
     print("==========================")
     precision_per_class = precision_score(test_labels, test_prediction, average=None)
     print(precision_per_class)
