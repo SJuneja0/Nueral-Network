@@ -63,11 +63,6 @@ def data_processing(ds):
 
 
 def build_model(input_shape, num_classes):
-    # hidden_units = 4
-    # inputs = keras.Input(shape=input_shape)
-    # x = layers.Rescaling(1. / 255)(inputs)
-    # x = layers.Flatten()(x)
-    # x = layers.Dense(hidden_units, activation='relu')(x)
 
     ########################### MAGIC HAPPENS HERE ##########################
     # Build up a neural network to achieve better performance.
@@ -75,17 +70,24 @@ def build_model(input_shape, num_classes):
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
 
+    hidden_units = 64
     train_ds, val_ds, test_ds = read_data()
-    x_input = keras.Input(shape=input_shape)
+    inputs = keras.Input(shape=input_shape)
 
     # Add layers to your model using the functional API
-    x = layers.Dense(64, activation='relu')(x_input)  # 64 is the batch size
+    x = layers.Rescaling(1. / 255)(inputs)
+    x = layers.Flatten()(x)
+    x = layers.Dense(hidden_units, activation='relu')(x)
+    # below in the layers.Dropout(0.2)(x) is 20% of the possible outcomes in x become 0, The purpose of using dropout
+    # is to prevent overfitting during training
     x = layers.Dropout(0.2)(x)
-    x = layers.Dense(32, activation='relu')(x)  # 32 is batch size /2
+    x = layers.Dense((hidden_units/2), activation='relu')(x)
     x = layers.Dropout(0.2)(x)
     x_output = layers.Dense(num_classes, activation='softmax')(x)
 
-    model = keras.Model(inputs=x_input, outputs=x_output)
+    model = keras.Model(inputs=inputs, outputs=x_output)
+
+    ### Delete start? ###
 
     # Compile the model with optimizer and loss function
     model.compile(optimizer=config['optimizer'],
@@ -113,11 +115,13 @@ def build_model(input_shape, num_classes):
     )
     # unsure if needed cuz of main
 
-    # this is just testing
-    test_loss, test_accuracy = model.evaluate(prediction_test, test_labels)
-    print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+    ### Delete end? ###
+    #
+    # # this is just testing
+    # test_loss, test_accuracy = model.evaluate(prediction_test, test_labels)
+    # print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
 
-    model.save('SaucyBoy.h5')  # saving the model
+    model.save('SaucyBoy.h5')  # saving the model, unsure if needed
 
     ########################### MAGIC ENDS HERE ##########################
     print(model.summary())
