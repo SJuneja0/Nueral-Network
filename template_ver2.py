@@ -19,7 +19,7 @@ matplotlib.use('TkAgg')
 
 # only change here and hidden_units that is inside build_mode()
 config = {
-    'batch_size': 32,  # 128 is high and 16 is low
+    'batch_size': 16,  # 128 is high and 16 is low
     'image_size': (48, 48),  # 128 is high and 16 is low
     'epochs': 10,  # 5 - 40  46 0.50, 30 got exactly 0.5000
     'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
     # 2. Report the precision and recall for 5 different classes Hint: check the precision and recall functions from
     # sklearn package, or you can implement these function by yourselves.
-    print(cm)
+    # print(cm)
     print("..................")
 
     precision = []
@@ -185,9 +185,12 @@ if __name__ == '__main__':
         pass
 
     print("----------------------------------------------")
-    print(misclassifiedIndexes)
+    print("---------SUMMERY----------")
+    print("\nTest Accuracy: ", test_acc)
+    print("Average Precision: " + str(sum(precision) / len(precision)))
+    print("Average Recall: " + str(sum(recall) / len(recall)))
 
-    print("ALL DONE")
+    print("\nALL DONE")
 
     ########################### MAGIC ENDS HERE ##########################
 
