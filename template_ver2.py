@@ -20,8 +20,8 @@ matplotlib.use('TkAgg')
 # only change here and hidden_units that is inside build_mode()
 config = {
     'batch_size': 64,  # 128 is high and 16 is low
-    'image_size': (128, 128),  # 128 is high and 16 is low
-    'epochs': 30,  # 5 - 40  46 0.50, 30 got exactly 0.5000
+    'image_size': (16, 16),  # 128 is high and 16 is low
+    'epochs': 3,  # 5 - 40  46 0.50, 30 got exactly 0.5000
     'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
 }
 
@@ -130,17 +130,43 @@ if __name__ == '__main__':
     # # print("==========================")
 
     # # create and display a confusion matrix
-    # cm = confusion_matrix(test_labels, test_prediction)
+    cm = confusion_matrix(test_labels, test_prediction)
     # cm_display = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
     # cm_display.plot()
     # plt.show()
 
     # 2. Report the precision and recall for 5 different classes Hint: check the precision and recall functions from
     # sklearn package, or you can implement these function by yourselves.
-    print("==========================")
-    precision_per_class = precision_score(test_labels, test_prediction, average=None)
-    print(precision_per_class)
-    print("==========================")
+    print(cm)
+    print("..................")
+
+    precision = []
+    for i in range(len(cm)):
+        col = []
+        for j in range(len(cm)):
+            row = cm[j]
+            col.append(row[i])
+        correct = col[i]
+        p_score = correct / sum(col)
+        precision.append(p_score)
+
+    recall = []
+    for i in range(len(cm)):
+        row = cm[i]
+        correct = row[i]
+        r_score = correct / sum(row)
+        recall.append(r_score)
+
+    print("Precision Scores")
+    for i in range(len(precision)):
+        print("Flower " + str(i) + ": " + str(precision[i]))
+
+    print("-------------")
+
+    print("Recall Scores")
+    for i in range(len(recall)):
+        print("Flower " + str(i) + ": " + str(recall[i]))
+    recall = []
 
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
@@ -153,8 +179,6 @@ if __name__ == '__main__':
 
     misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]],
                            test_images[misclassifiedIndexes[2]]]
-    # print(misclassifiedImages[0])
-    # print(type(misclassifiedImages))
     for image in misclassifiedImages:
         pass
 
