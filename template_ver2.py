@@ -19,9 +19,9 @@ matplotlib.use('TkAgg')
 
 # only change here and hidden_units that is inside build_mode()
 config = {
-    'batch_size': 64,  # 128 is high and 16 is low
-    'image_size': (16, 16),  # 128 is high and 16 is low
-    'epochs': 3,  # 5 - 40  46 0.50, 30 got exactly 0.5000
+    'batch_size': 32,  # 128 is high and 16 is low
+    'image_size': (48, 48),  # 128 is high and 16 is low
+    'epochs': 10,  # 5 - 40  46 0.50, 30 got exactly 0.5000
     'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
 }
 
@@ -50,8 +50,9 @@ def data_processing(ds):
         [
             ########################### MAGIC HAPPENS HERE ##########################
             # Use dataset augmentation methods to prevent overfitting
-            layers.RandomFlip("horizontal"),
-            layers.RandomRotation(0.3)
+            layers.RandomFlip("vertical"),
+            layers.RandomRotation(0.3),
+            layers.RandomZoom(0.3)
             ########################### MAGIC ENDS HERE ##########################
         ]
     )
@@ -71,7 +72,7 @@ def build_model(input_shape, num_classes):
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
 
-    hidden_units = 266 # 125 - 400
+    hidden_units = 200 # 125 - 400
     train_ds, val_ds, test_ds = read_data()
     inputs = keras.Input(shape=input_shape)
 
@@ -160,13 +161,14 @@ if __name__ == '__main__':
     print("Precision Scores")
     for i in range(len(precision)):
         print("Flower " + str(i) + ": " + str(precision[i]))
+    print("Average Precision: " + str(sum(precision) / len(precision)))
 
     print("-------------")
 
     print("Recall Scores")
     for i in range(len(recall)):
         print("Flower " + str(i) + ": " + str(recall[i]))
-    recall = []
+    print("Average Recall: " + str(sum(recall) / len(recall)))
 
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
