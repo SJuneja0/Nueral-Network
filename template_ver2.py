@@ -20,8 +20,8 @@ matplotlib.use('TkAgg')
 # only change here and hidden_units that is inside build_mode()
 config = {
     'batch_size': 32,  # 128 is high and 16 is low
-    'image_size': (48, 48),  # 128 is high and 16 is low
-    'epochs': 10,  # 5 - 40  46 0.50, 30 got exactly 0.5000
+    'image_size': (128, 128),  # 128 is high and 16 is low
+    'epochs': 30,  # 5 - 40  46 0.50, 30 got exactly 0.5000
     'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
 }
 
