@@ -6,7 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn
-from sklearn.metrics import confusion_matrix, recall_score
+from sklearn.metrics import confusion_matrix, recall_score, f1_score
 from sklearn.metrics import precision_score
 
 matplotlib.use('TkAgg')
@@ -22,7 +22,7 @@ config = {
     'batch_size': 32,  # 128 is high and 16 is low
     'image_size': (128, 128),  # 128 is high and 16 is low
     'epochs': 30,  # 5 - 40  46 0.50, 30 got exactly 0.5000
-    'optimizer': keras.optimizers.experimental.SGD(1e-2)  # possibly, figure out later
+    'optimizer': keras.optimizers.experimental.Adam(learning_rate=0.001)
 }
 
 
@@ -51,8 +51,11 @@ def data_processing(ds):
             ########################### MAGIC HAPPENS HERE ##########################
             # Use dataset augmentation methods to prevent overfitting
             layers.RandomFlip("vertical"),
-            layers.RandomRotation(0.3),
-            layers.RandomZoom(0.3)
+            layers.RandomFlip("horizontal"),
+            layers.RandomRotation(0.1),
+            layers.RandomZoom(0.1),
+            layers.RandomBrightness(factor=0.2),
+            layers.RandomContrast(factor=0.2)
             ########################### MAGIC ENDS HERE ##########################
         ]
     )
@@ -72,23 +75,22 @@ def build_model(input_shape, num_classes):
     # Hint: Use a Deeper network (i.e., more hidden layers, different type of layers)
     # and different combination of activation function to achieve better result.
 
-    hidden_units = 200 # 125 - 400
-    train_ds, val_ds, test_ds = read_data()
+    hidden_units = 64  # 125 - 400
     inputs = keras.Input(shape=input_shape)
 
     # Add layers to your model using the functional API
     x = layers.Rescaling(1. / 255)(inputs)
     x = layers.Flatten()(x)
-    x = layers.Dense(hidden_units, activation='relu')(x)
-    # below in the layers.Dropout(0.2)(x) is 20% of the possible outcomes in x become 0, The purpose of using dropout
-    # is to prevent overfitting during training
-    x = layers.Dropout(0.2)(x)
-    x = layers.Dense((hidden_units/2), activation='relu')(x)
-    x = layers.Dropout(0.2)(x)
+    x = layers.Dense(hidden_units, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
+    x = keras.layers.Dropout(0.3)(x)  # Increased dropout rate
+    x = keras.layers.BatchNormalization()(x)  # Batch normalization
+    x = keras.layers.Dense(hidden_units // 2, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
+    x = keras.layers.Dropout(0.3)(x)  # Increased dropout rate
+    x = keras.layers.BatchNormalization()(x)  # Batch normalization
 
     ########################### MAGIC ENDS HERE ##########################
     outputs = layers.Dense(num_classes, activation="softmax",
-                           kernel_initializer='he_normal')(x)
+                           kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
     model = keras.Model(inputs, outputs)
     print(model.summary())
     return model
@@ -146,7 +148,7 @@ if __name__ == '__main__':
 
     # 2. Report the precision and recall for 5 different classes Hint: check the precision and recall functions from
     # sklearn package, or you can implement these function by yourselves.
-    print(cm)
+    # print(cm)
     print("..................")
 
     precision = precision_score(test_labels, test_predictions, average=None)
@@ -154,6 +156,13 @@ if __name__ == '__main__':
     for i in range(len(precision)):
         print(f"Flower {i} - Precision: {precision[i]}, Recall: {recall[i]}")
 
+    macro_precision = precision_score(test_labels, test_predictions, average='macro')
+    macro_recall = recall_score(test_labels, test_predictions, average='macro')
+    macro_f1 = f1_score(test_labels, test_predictions, average='macro')
+
+    weighted_precision = precision_score(test_labels, test_predictions, average='weighted')
+    weighted_recall = recall_score(test_labels, test_predictions, average='weighted')
+    weighted_f1 = f1_score(test_labels, test_predictions, average='weighted')
 
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
@@ -168,9 +177,12 @@ if __name__ == '__main__':
 
 
     print("----------------------------------------------")
-    print(misclassified_indexes)
+    print("---------SUMMERY----------")
+    print("\nTest Accuracy: ", test_acc)
+    print("Average Precision: " + str(sum(precision) / len(precision)))
+    print("Average Recall: " + str(sum(recall) / len(recall)))
 
-    print("ALL DONE")
+    print("\nALL DONE")
 
     ########################### MAGIC ENDS HERE ##########################
 
