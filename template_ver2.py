@@ -6,7 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, recall_score
 from sklearn.metrics import precision_score
 
 matplotlib.use('TkAgg')
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     print("\nTest Accuracy: ", test_acc)
     test_images = np.concatenate([x for x, y in test_ds], axis=0)
     test_labels = np.concatenate([y for x, y in test_ds], axis=0)
-    test_prediction = np.argmax(model.predict(test_images), 1)
+    test_predictions = np.argmax(model.predict(test_images), 1)
 
     # 1. Visualize the confusion matrix by matplotlib and sklearn based on test_prediction and test_labels
 
@@ -131,58 +131,41 @@ if __name__ == '__main__':
     # # print("==========================")
 
     # # create and display a confusion matrix
-    cm = confusion_matrix(test_labels, test_prediction)
+    cm = confusion_matrix(test_labels, test_predictions)
     # cm_display = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
     # cm_display.plot()
     # plt.show()
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title('Confusion Matrix')
+    plt.colorbar()
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show()
+
 
     # 2. Report the precision and recall for 5 different classes Hint: check the precision and recall functions from
     # sklearn package, or you can implement these function by yourselves.
     # print(cm)
     print("..................")
 
-    precision = []
-    for i in range(len(cm)):
-        col = []
-        for j in range(len(cm)):
-            row = cm[j]
-            col.append(row[i])
-        correct = col[i]
-        p_score = correct / sum(col)
-        precision.append(p_score)
-
-    recall = []
-    for i in range(len(cm)):
-        row = cm[i]
-        correct = row[i]
-        r_score = correct / sum(row)
-        recall.append(r_score)
-
-    print("Precision Scores")
+    precision = precision_score(test_labels, test_predictions, average=None)
+    recall = recall_score(test_labels, test_predictions, average=None)
     for i in range(len(precision)):
-        print("Flower " + str(i) + ": " + str(precision[i]))
-    print("Average Precision: " + str(sum(precision) / len(precision)))
+        print(f"Flower {i} - Precision: {precision[i]}, Recall: {recall[i]}")
 
-    print("-------------")
-
-    print("Recall Scores")
-    for i in range(len(recall)):
-        print("Flower " + str(i) + ": " + str(recall[i]))
-    print("Average Recall: " + str(sum(recall) / len(recall)))
 
     # 3. Visualize three misclassified images
     # Hint: Use the test_images array to generate the misclassified images using matplotlib
-    misclassifiedIndexes = []
-    for i in range(len(test_prediction)):
-        if test_prediction[i] != test_labels[i]:
-            misclassifiedIndexes.append(i)
-        if len(misclassifiedIndexes) > 3:
-            break
+    misclassified_indexes = np.where(test_labels != test_predictions)[0][:3]
+    misclassified_images = test_images[misclassified_indexes]
+    for i, image in enumerate(misclassified_images):
+        plt.subplot(1, 3, i+1)
+        plt.imshow(image)
+        plt.title(f"True: {test_labels[misclassified_indexes[i]]}, "
+                  f"Predicted: {test_predictions[misclassified_indexes[i]]}")
+    plt.show()
 
-    misclassifiedImages = [test_images[misclassifiedIndexes[0]], test_images[misclassifiedIndexes[1]],
-                           test_images[misclassifiedIndexes[2]]]
-    for image in misclassifiedImages:
-        pass
 
     print("----------------------------------------------")
     print("---------SUMMERY----------")
