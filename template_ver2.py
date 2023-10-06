@@ -19,9 +19,9 @@ matplotlib.use('TkAgg')
 
 # only change here and hidden_units that is inside build_mode()
 config = {
-    'batch_size': 32,  # 128 is high and 16 is low
+    'batch_size': 128,  # 128 is high and 16 is low
     'image_size': (128, 128),  # 128 is high and 16 is low
-    'epochs': 30,  # 5 - 40  46 0.50, 30 got exactly 0.5000
+    'epochs': 32,  # 5 - 40  46 0.50, 30 got exactly 0.5000
     'optimizer': keras.optimizers.experimental.Adam(learning_rate=0.001)
 }
 
@@ -52,10 +52,12 @@ def data_processing(ds):
             # Use dataset augmentation methods to prevent overfitting
             layers.RandomFlip("vertical"),
             layers.RandomFlip("horizontal"),
-            layers.RandomRotation(0.1),
-            layers.RandomZoom(0.1),
+            layers.RandomRotation(0.4),
+            layers.RandomZoom(0.2),
             layers.RandomBrightness(factor=0.2),
-            layers.RandomContrast(factor=0.2)
+            layers.RandomContrast(factor=0.2),
+            layers.RandomTranslation(height_factor=0.1, width_factor=0.1),
+            layers.GaussianNoise(0.2)
             ########################### MAGIC ENDS HERE ##########################
         ]
     )
@@ -80,17 +82,19 @@ def build_model(input_shape, num_classes):
 
     # Add layers to your model using the functional API
     x = layers.Rescaling(1. / 255)(inputs)
+    x = layers.Conv2D((hidden_units // 2), (3, 3), activation='relu')(x)
+    x = layers.MaxPool2D((2, 2))(x)
+    x = layers.Conv2D(hidden_units, (5, 5), activation='relu')(x)
+    x = layers.MaxPool2D((2, 2))(x)
     x = layers.Flatten()(x)
-    x = layers.Dense(hidden_units, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
-    x = keras.layers.Dropout(0.3)(x)  # Increased dropout rate
-    x = keras.layers.BatchNormalization()(x)  # Batch normalization
-    x = keras.layers.Dense(hidden_units // 2, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
-    x = keras.layers.Dropout(0.3)(x)  # Increased dropout rate
-    x = keras.layers.BatchNormalization()(x)  # Batch normalization
+
+    x = keras.layers.Dense((hidden_units // 2), activation='relu')(x)
+    x = layers.BatchNormalization()(x)
+    x = keras.layers.Dropout(0.4)(x)  # Increased dropout rate
 
     ########################### MAGIC ENDS HERE ##########################
     outputs = layers.Dense(num_classes, activation="softmax",
-                           kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l2(1e-4))(x)
+                           kernel_initializer='he_normal')(x)
     model = keras.Model(inputs, outputs)
     print(model.summary())
     return model
@@ -116,6 +120,7 @@ if __name__ == '__main__':
     )
     ########################### MAGIC HAPPENS HERE ##########################
     print(history.history)
+    print(model.summary())
     test_loss, test_acc = model.evaluate(test_ds, verbose=2)
     print("\nTest Accuracy: ", test_acc)
     test_images = np.concatenate([x for x, y in test_ds], axis=0)
